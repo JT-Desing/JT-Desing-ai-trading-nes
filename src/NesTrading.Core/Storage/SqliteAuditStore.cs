@@ -21,7 +21,7 @@ namespace NesTrading.Core.Storage
             var dir = Path.GetDirectoryName(fullPath);
             if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
-            _connection = new SqliteConnection("Data Source=" + fullPath);
+            _connection = new SqliteConnection("Data Source=" + fullPath + ";Pooling=False");
             _connection.Open();
             InitializeSchema();
         }
