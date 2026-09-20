@@ -1,0 +1,2 @@
+{"EventId":"fixture-e1","SessionId":"fixture-session","Type":"SESSION_STARTED","TimestampUtc":"2026-09-21T14:00:00Z","Version":1,"PayloadJson":"{}","PayloadHash":"44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","SignalId":null,"TradeId":null}
+{"EventId":"fixture-e2","SessionId":"fixture-session","Type":"NO_TECHNICAL_SETUP","TimestampUtc":"2026-09-21T14:00:05Z","Version":1,"PayloadJson":"{\"regime\":\"Range\"}","PayloadHash":"807cabb66bbdbd4336a3da95b27f044fc4f53d4903e282840d3fd19d7eb56e6d","SignalId":null,"TradeId":null}
