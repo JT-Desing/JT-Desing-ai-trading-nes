@@ -38,14 +38,14 @@ namespace NesTrading.Core.Execution
             var candidate = approvedDecision.Candidate;
             var signalId = candidate.SignalId;
 
-            if (_externalExposurePresent)
-                return ExecutionResult.Reject("BROKER_EXPOSURE_PRESENT");
-
             if (_unresolvedSignals.Contains(signalId))
                 return ExecutionResult.Reject("ACK_RECONCILIATION_REQUIRED");
 
             if (_consumedSignals.Contains(signalId))
                 return ExecutionResult.Reject("DUPLICATE_SIGNAL");
+
+            if (_externalExposurePresent)
+                return ExecutionResult.Reject("BROKER_EXPOSURE_PRESENT");
 
             if (_openTrades.Count > 0)
                 return ExecutionResult.Reject("POSITION_ALREADY_OPEN");
