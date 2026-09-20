@@ -8,3 +8,5 @@ Pre-flight:
 - Task 1 -> Tasks 5/6: strict validators produce domain-safe NewsState/TradeDecision envelopes; interfaces align.
 - Task 2 -> Tasks 5/6/8: cache consumes AgentEnvelope<T>; interfaces align.
 - Task 7 -> Tasks 5/6/8: budget controller consumed by model-backed agents; interfaces align.
+
+Task 1: complete (tests: GitHub Actions run #49 -> build success, 133/133 passed)
