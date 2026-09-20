@@ -331,6 +331,34 @@ namespace NesTrading.Core.Runtime
 
             RefreshSessionState();
 
+            if (!TryAppend(TradingEvent.Create(
+                EventId(),
+                _sessionId,
+                "SESSION_METRICS",
+                closeTime,
+                JsonConvert.SerializeObject(new
+                {
+                    tradesToday = _sessionState.TradesToday,
+                    losingTradesToday = _sessionState.LosingTradesToday,
+                    dailyPnlUsd = _sessionState.DailyPnlUsd,
+                    hasOpenPosition = _sessionState.HasOpenPosition,
+                    lastTradeClosedAtUtc = _sessionState.LastTradeClosedAtUtc
+                }),
+                candidate.SignalId,
+                execution.TradeId)))
+            {
+                ForceSafeLock(false);
+                return new PaperStepResult(
+                    true,
+                    RiskDecision.Reject(
+                        candidate.SignalId,
+                        "AUDIT_PERSISTENCE_FAILURE",
+                        candidate),
+                    execution,
+                    tradeResult,
+                    _stateMachine.CurrentState);
+            }
+
             return new PaperStepResult(
                 true,
                 risk,
