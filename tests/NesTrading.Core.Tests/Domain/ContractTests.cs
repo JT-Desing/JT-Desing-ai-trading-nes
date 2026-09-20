@@ -38,6 +38,31 @@ namespace NesTrading.Core.Tests.Domain
         }
 
         [Test]
+        public void NesContractSpecs_MatchCmeE_NanoSp500Contract()
+        {
+            Assert.That(NesContractSpecs.UsdPerPoint, Is.EqualTo(0.50m));
+            Assert.That(NesContractSpecs.TickSizePoints, Is.EqualTo(0.50m));
+            Assert.That(NesContractSpecs.UsdPerTick, Is.EqualTo(0.25m));
+        }
+
+        [TestCase(6122.25)]
+        [TestCase(6122.75)]
+        public void TradeCandidate_RejectsPricesThatAreNotAlignedToNesHalfPointTick(double invalidPrice)
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new TradeCandidate(
+                    "sig-tick",
+                    "NES",
+                    TradeDirection.Long,
+                    (decimal)invalidPrice,
+                    6118m,
+                    6130m,
+                    90,
+                    1,
+                    Now));
+        }
+
+        [Test]
         public void TradeCandidate_V1_UsesExactlyOneNesContract()
         {
             var candidate = new TradeCandidate("sig-1", "NES", TradeDirection.Long, 6122m, 6117.5m, 6131m, 82, 1, Now);
