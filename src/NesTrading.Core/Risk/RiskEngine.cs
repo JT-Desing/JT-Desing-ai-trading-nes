@@ -133,11 +133,14 @@ namespace NesTrading.Core.Risk
             var netRewardUsd = Math.Max(0m, grossRewardUsd - costs.TotalFrictionUsd);
             var netRewardRisk = totalRiskUsd > 0m ? netRewardUsd / totalRiskUsd : 0m;
 
-            if (netRewardRisk < _policy.MinNetRewardRisk)
-                return Reject(candidate, "REWARD_RISK_TOO_LOW", totalRiskUsd, riskPercent);
-
+            // The hard monetary risk cap has diagnostic priority over trade-quality filters.
+            // A structurally wide stop must be identified as a risk-cap rejection, never "fixed"
+            // by tightening the stop or obscured behind a reward/risk reason.
             if (riskPercent > _policy.HardMaxRiskPercent)
                 return Reject(candidate, "RISK_PER_TRADE_HARD_MAX", totalRiskUsd, riskPercent);
+
+            if (netRewardRisk < _policy.MinNetRewardRisk)
+                return Reject(candidate, "REWARD_RISK_TOO_LOW", totalRiskUsd, riskPercent);
 
             return RiskDecision.Approve(candidate, totalRiskUsd, riskPercent);
         }
