@@ -133,6 +133,29 @@ namespace NesTrading.Core.Tests.Runtime
         }
 
         [Test]
+        public void RestartWithPreviouslySeenSignal_RejectsPersistedDuplicateBeforeExecution()
+        {
+            var store = new InMemoryEventStore();
+            const string signalId = "NES-20260921140000000-L";
+            store.Append(TradingEvent.Create(
+                "prior-risk",
+                "session-1",
+                "RISK_APPROVED",
+                Now.AddSeconds(-1),
+                "{\"reason\":\"APPROVED\"}",
+                signalId));
+
+            var spy = new CountingExecutionAdapter();
+            var restarted = CreateRunner(store, spy);
+
+            var result = restarted.Process(new PaperStepInput(BullishSnapshot(), News(NewsGate.Allow), false, null));
+
+            Assert.That(result.RiskDecision.IsApproved, Is.False);
+            Assert.That(result.RiskDecision.ReasonCode, Is.EqualTo("DUPLICATE_SIGNAL_PERSISTED"));
+            Assert.That(spy.SubmitCalls, Is.EqualTo(0));
+        }
+
+        [Test]
         public void ExecutionReject_DoesNotCreateTradeOpenedEvent()
         {
             var store = new InMemoryEventStore();
