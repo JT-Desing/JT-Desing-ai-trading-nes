@@ -114,6 +114,24 @@ namespace NesTrading.Core.Tests.Execution
         }
 
         [Test]
+        public void ReconcilePresent_BlocksAnyDifferentSignalUntilExternalExposureIsResolved()
+        {
+            var settings = new SimulationExecutionSettings(0, 0, 0m, false, AckState.Unknown);
+            var adapter = new SimulatedExecutionAdapter(settings);
+
+            adapter.SubmitBracket(Approved("sig-unknown"));
+            var reconciliation = adapter.Reconcile("sig-unknown", BrokerOrderPresence.Present);
+            adapter.SetNextAckState(AckState.Accepted);
+
+            var differentSignal = adapter.SubmitBracket(Approved("sig-new"));
+
+            Assert.That(reconciliation.Resolved, Is.True);
+            Assert.That(adapter.GetSnapshot().ExternalExposurePresent, Is.True);
+            Assert.That(differentSignal.Accepted, Is.False);
+            Assert.That(differentSignal.ReasonCode, Is.EqualTo("BROKER_EXPOSURE_PRESENT"));
+        }
+
+        [Test]
         public void ForcedMissedFill_DoesNotCreateOpenTrade()
         {
             var settings = new SimulationExecutionSettings(0, 0, 0m, true, AckState.Accepted);
