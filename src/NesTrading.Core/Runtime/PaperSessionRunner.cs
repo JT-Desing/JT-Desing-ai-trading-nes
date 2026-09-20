@@ -148,6 +148,29 @@ namespace NesTrading.Core.Runtime
                 return AuditFailure(candidate);
             }
 
+            if (WasSignalPreviouslyEvaluated(candidate.SignalId))
+            {
+                var persistedDuplicate = RiskDecision.Reject(
+                    candidate.SignalId,
+                    "DUPLICATE_SIGNAL_PERSISTED",
+                    candidate);
+
+                TryAppend(TradingEvent.Create(
+                    EventId(),
+                    _sessionId,
+                    "RISK_REJECTED",
+                    now,
+                    JsonConvert.SerializeObject(new { reason = persistedDuplicate.ReasonCode }),
+                    candidate.SignalId));
+
+                return new PaperStepResult(
+                    true,
+                    persistedDuplicate,
+                    null,
+                    null,
+                    _stateMachine.CurrentState);
+            }
+
             var tradeAction = candidate.Direction == TradeDirection.Long ? TradeAction.Long : TradeAction.Short;
             var tradeDecision = new TradeDecision(
                 "NES",
@@ -339,6 +362,35 @@ namespace NesTrading.Core.Runtime
                 audit.DailyPnlUsd,
                 audit.LastTradeClosedAtUtc,
                 brokerPositionKnown: true);
+        }
+
+        private bool WasSignalPreviouslyEvaluated(string signalId)
+        {
+            try
+            {
+                foreach (var evt in _eventStore.LoadSession(_sessionId))
+                {
+                    if (!string.Equals(evt.SignalId, signalId, StringComparison.Ordinal))
+                        continue;
+
+                    if (evt.Type == "RISK_APPROVED" ||
+                        evt.Type == "RISK_REJECTED" ||
+                        evt.Type == "EXECUTION_ACCEPTED" ||
+                        evt.Type == "EXECUTION_REJECTED" ||
+                        evt.Type == "TRADE_OPENED" ||
+                        evt.Type == "TRADE_CLOSED")
+                        return true;
+                }
+
+                return false;
+            }
+            catch
+            {
+                // If historical audit state cannot be read, do not risk evaluating
+                // the same signal as if the process had never seen it.
+                ForceSafeLock(false);
+                return true;
+            }
         }
 
         private bool TryAppend(TradingEvent evt)
