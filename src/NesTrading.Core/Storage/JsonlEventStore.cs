@@ -57,8 +57,9 @@ namespace NesTrading.Core.Storage
             {
                 return ReadAndValidateAll()
                     .Where(x => string.Equals(x.SessionId, sessionId, StringComparison.Ordinal))
+                    // LINQ OrderBy is stable: equal timestamps retain physical append order.
+                    // That matters for open/close events emitted in the same clock tick.
                     .OrderBy(x => x.TimestampUtc)
-                    .ThenBy(x => x.EventId, StringComparer.Ordinal)
                     .ToArray();
             }
         }
