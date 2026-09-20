@@ -63,6 +63,16 @@ namespace NesTrading.Core.Tests.Domain
         }
 
         [Test]
+        public void TradeCandidate_RejectsStopOrTargetThatAreNotAlignedToNesTick()
+        {
+            Assert.Throws<ArgumentException>(() =>
+                new TradeCandidate("sig-stop", "NES", TradeDirection.Long, 6122m, 6118.25m, 6130m, 90, 1, Now));
+
+            Assert.Throws<ArgumentException>(() =>
+                new TradeCandidate("sig-target", "NES", TradeDirection.Long, 6122m, 6118m, 6130.25m, 90, 1, Now));
+        }
+
+        [Test]
         public void TradeCandidate_V1_UsesExactlyOneNesContract()
         {
             var candidate = new TradeCandidate("sig-1", "NES", TradeDirection.Long, 6122m, 6117.5m, 6131m, 82, 1, Now);
