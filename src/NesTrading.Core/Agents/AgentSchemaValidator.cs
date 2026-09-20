@@ -202,11 +202,22 @@ namespace NesTrading.Core.Agents
         private static bool TryUtc(JToken token, out DateTime value)
         {
             value = default(DateTime);
-            if (token == null || token.Type != JTokenType.String) return false;
+            if (token == null) return false;
+
+            if (token.Type == JTokenType.Date)
+            {
+                var parsed = token.Value<DateTime>();
+                value = parsed.Kind == DateTimeKind.Utc ? parsed : parsed.ToUniversalTime();
+                return true;
+            }
+
+            if (token.Type != JTokenType.String) return false;
+
             DateTimeOffset dto;
             if (!DateTimeOffset.TryParse(token.Value<string>(), CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out dto))
                 return false;
+
             value = dto.UtcDateTime;
             return true;
         }
