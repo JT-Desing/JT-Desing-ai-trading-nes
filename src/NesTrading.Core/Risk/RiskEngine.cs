@@ -7,7 +7,7 @@ namespace NesTrading.Core.Risk
 {
     public sealed class RiskEngine
     {
-        public const decimal NesUsdPerPoint = 0.50m;
+        public const decimal NesUsdPerPoint = NesContractSpecs.UsdPerPoint;
 
         private readonly RiskPolicy _policy;
         private readonly HashSet<string> _evaluatedSignals = new HashSet<string>(StringComparer.Ordinal);
