@@ -59,6 +59,12 @@ namespace NesTrading.Core.Tests.Runtime
             Assert.That(types, Does.Contain("EXECUTION_ACCEPTED"));
             Assert.That(types, Does.Contain("TRADE_OPENED"));
             Assert.That(types, Does.Contain("TRADE_CLOSED"));
+            Assert.That(types, Does.Contain("SESSION_METRICS"));
+
+            var metricsEvent = store.Events.Single(x => x.Type == "SESSION_METRICS");
+            var metrics = Newtonsoft.Json.Linq.JObject.Parse(metricsEvent.PayloadJson);
+            Assert.That(metrics["tradesToday"].ToObject<int>(), Is.EqualTo(1));
+            Assert.That(metrics["dailyPnlUsd"].ToObject<decimal>(), Is.EqualTo(result.TradeResult.NetPnlUsd));
 
             var audit = store.Reconstruct("session-1");
             Assert.That(audit.TradesToday, Is.EqualTo(1));
@@ -152,6 +158,27 @@ namespace NesTrading.Core.Tests.Runtime
 
             Assert.That(result.RiskDecision.IsApproved, Is.False);
             Assert.That(result.RiskDecision.ReasonCode, Is.EqualTo("DUPLICATE_SIGNAL_PERSISTED"));
+            Assert.That(spy.SubmitCalls, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void RestartAfterTwoCompletedTrades_PreservesDailyLimitAndRejectsThirdTrade()
+        {
+            var store = new InMemoryEventStore();
+
+            store.Append(TradingEvent.Create("o1", "session-1", "TRADE_OPENED", Now.AddMinutes(-30), "{}", "old-sig-1", "old-trade-1"));
+            store.Append(TradingEvent.Create("c1", "session-1", "TRADE_CLOSED", Now.AddMinutes(-25), "{\"netPnlUsd\":1.00}", "old-sig-1", "old-trade-1"));
+            store.Append(TradingEvent.Create("o2", "session-1", "TRADE_OPENED", Now.AddMinutes(-20), "{}", "old-sig-2", "old-trade-2"));
+            store.Append(TradingEvent.Create("c2", "session-1", "TRADE_CLOSED", Now.AddMinutes(-15), "{\"netPnlUsd\":0.50}", "old-sig-2", "old-trade-2"));
+
+            var spy = new CountingExecutionAdapter();
+            var restarted = CreateRunner(store, spy);
+
+            var result = restarted.Process(new PaperStepInput(BullishSnapshot(), News(NewsGate.Allow), false, null));
+
+            Assert.That(result.HasCandidate, Is.True);
+            Assert.That(result.RiskDecision.IsApproved, Is.False);
+            Assert.That(result.RiskDecision.ReasonCode, Is.EqualTo("MAX_TRADES_REACHED"));
             Assert.That(spy.SubmitCalls, Is.EqualTo(0));
         }
 
