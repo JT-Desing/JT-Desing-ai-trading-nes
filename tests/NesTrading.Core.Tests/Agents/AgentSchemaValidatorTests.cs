@@ -112,7 +112,9 @@ namespace NesTrading.Core.Tests.Agents
         [Test]
         public void NewsPayload_MissingReasonCodes_IsRejected()
         {
-            var json = ValidNewsJson.Replace(@",""reason_codes"":[""NO_MAJOR_EVENT""]", "");
+            var parsed = Newtonsoft.Json.Linq.JObject.Parse(ValidNewsJson);
+            parsed.Remove("reason_codes");
+            var json = parsed.ToString(Newtonsoft.Json.Formatting.None);
             var result = AgentSchemaValidator.ValidateNews(json, ProviderCompletion.CompletedForTests(json), "p1", Utc(14,0,1));
 
             Assert.That(result.IsValid, Is.False);
