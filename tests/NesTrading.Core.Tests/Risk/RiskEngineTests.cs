@@ -116,6 +116,30 @@ namespace NesTrading.Core.Tests.Risk
             Assert.That(second.ReasonCode, Is.EqualTo("DUPLICATE_SIGNAL"));
         }
 
+        [Test]
+        public void NewsCaution_WithSetupScoreBelowEightyFive_IsRejected()
+        {
+            var cautiousMarket = new MarketState("NES", MarketRegime.TrendUp, TradeDirection.Long, "VWAP_PULLBACK", 80,
+                VolatilityState.Normal, true, Now.AddSeconds(-5), Now.AddSeconds(30), new[] { "TEST" });
+
+            var result = Evaluate(new RiskEngine(RiskPolicy.V1Defaults()), news: News(NewsGate.Caution), market: cautiousMarket);
+
+            Assert.That(result.IsApproved, Is.False);
+            Assert.That(result.ReasonCode, Is.EqualTo("NEWS_CAUTION_SCORE_TOO_LOW"));
+        }
+
+        [Test]
+        public void MarketDirectionMismatchWithCandidate_IsRejected()
+        {
+            var bearishMarket = new MarketState("NES", MarketRegime.TrendDown, TradeDirection.Short, "VWAP_PULLBACK", 90,
+                VolatilityState.Normal, true, Now.AddSeconds(-5), Now.AddSeconds(30), new[] { "TEST" });
+
+            var result = Evaluate(new RiskEngine(RiskPolicy.V1Defaults()), market: bearishMarket);
+
+            Assert.That(result.IsApproved, Is.False);
+            Assert.That(result.ReasonCode, Is.EqualTo("MARKET_DIRECTION_MISMATCH"));
+        }
+
         [TestCase(NewsGate.Block, "NEWS_BLOCK")]
         public void NewsBlock_IsAlwaysRejected(NewsGate gate, string expectedReason)
         {
