@@ -14,6 +14,7 @@ namespace NesTrading.Core.Execution
         private readonly Dictionary<string, SimulatedOpenTrade> _openTrades = new Dictionary<string, SimulatedOpenTrade>(StringComparer.Ordinal);
         private readonly HashSet<string> _consumedSignals = new HashSet<string>(StringComparer.Ordinal);
         private readonly HashSet<string> _unresolvedSignals = new HashSet<string>(StringComparer.Ordinal);
+        private bool _externalExposurePresent;
         private AckState _nextAckState;
 
         public SimulatedExecutionAdapter(SimulationExecutionSettings settings)
@@ -36,6 +37,9 @@ namespace NesTrading.Core.Execution
 
             var candidate = approvedDecision.Candidate;
             var signalId = candidate.SignalId;
+
+            if (_externalExposurePresent)
+                return ExecutionResult.Reject("BROKER_EXPOSURE_PRESENT");
 
             if (_unresolvedSignals.Contains(signalId))
                 return ExecutionResult.Reject("ACK_RECONCILIATION_REQUIRED");
@@ -84,7 +88,10 @@ namespace NesTrading.Core.Execution
 
         public BrokerSnapshot GetSnapshot()
         {
-            return new BrokerSnapshot(_openTrades.Values.ToArray(), _unresolvedSignals.ToArray());
+            return new BrokerSnapshot(
+                _openTrades.Values.ToArray(),
+                _unresolvedSignals.ToArray(),
+                _externalExposurePresent);
         }
 
         public ReconciliationResult Reconcile(string signalId, BrokerOrderPresence presence)
@@ -99,6 +106,7 @@ namespace NesTrading.Core.Execution
             if (presence == BrokerOrderPresence.Present)
             {
                 _consumedSignals.Add(signalId);
+                _externalExposurePresent = true;
                 return new ReconciliationResult(true, false, "BROKER_ORDER_PRESENT");
             }
 
