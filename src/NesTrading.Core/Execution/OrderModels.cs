@@ -122,14 +122,19 @@ namespace NesTrading.Core.Execution
 
     public sealed class BrokerSnapshot
     {
-        public BrokerSnapshot(IEnumerable<SimulatedOpenTrade> openTrades, IEnumerable<string> unresolvedSignals)
+        public BrokerSnapshot(
+            IEnumerable<SimulatedOpenTrade> openTrades,
+            IEnumerable<string> unresolvedSignals,
+            bool externalExposurePresent = false)
         {
             OpenTrades = (openTrades ?? Enumerable.Empty<SimulatedOpenTrade>()).ToArray();
             UnresolvedSignals = (unresolvedSignals ?? Enumerable.Empty<string>()).ToArray();
+            ExternalExposurePresent = externalExposurePresent;
         }
 
         public IReadOnlyList<SimulatedOpenTrade> OpenTrades { get; }
         public IReadOnlyList<string> UnresolvedSignals { get; }
+        public bool ExternalExposurePresent { get; }
     }
 
     public sealed class CloseResult
