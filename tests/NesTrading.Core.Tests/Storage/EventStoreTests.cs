@@ -69,7 +69,7 @@ namespace NesTrading.Core.Tests.Storage
             var store = new JsonlEventStore(path);
             store.Append(E("evt-1", "s1", "SESSION_STARTED", T0, "{\"ok\":true}"));
 
-            var text = File.ReadAllText(path).Replace("\"ok\":true", "\"ok\":false");
+            var text = File.ReadAllText(path).Replace("{\\\"ok\\\":true}", "{\\\"ok\\\":false}");
             File.WriteAllText(path, text);
 
             Assert.Throws<AuditIntegrityException>(() => store.LoadSession("s1"));
