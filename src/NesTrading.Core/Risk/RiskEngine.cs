@@ -89,9 +89,15 @@ namespace NesTrading.Core.Risk
             if (news.State == NewsGate.Block)
                 return Reject(candidate, "NEWS_BLOCK");
 
+            if (news.State == NewsGate.Caution && market.SetupScore < 85)
+                return Reject(candidate, "NEWS_CAUTION_SCORE_TOO_LOW");
+
             if (!market.Valid ||
                 (market.Regime != MarketRegime.TrendUp && market.Regime != MarketRegime.TrendDown))
                 return Reject(candidate, "MARKET_NOT_TRADABLE");
+
+            if (market.Direction != candidate.Direction)
+                return Reject(candidate, "MARKET_DIRECTION_MISMATCH");
 
             if (trade.Action != TradeAction.Long && trade.Action != TradeAction.Short)
                 return Reject(candidate, "TRADE_DECISION_NOT_EXECUTABLE");
