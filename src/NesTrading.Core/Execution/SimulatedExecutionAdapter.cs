@@ -8,7 +8,7 @@ namespace NesTrading.Core.Execution
 {
     public sealed class SimulatedExecutionAdapter : IExecutionAdapter
     {
-        public const decimal NesTickSize = 0.25m;
+        public const decimal NesTickSize = NesContractSpecs.TickSizePoints;
 
         private readonly SimulationExecutionSettings _settings;
         private readonly Dictionary<string, SimulatedOpenTrade> _openTrades = new Dictionary<string, SimulatedOpenTrade>(StringComparer.Ordinal);
