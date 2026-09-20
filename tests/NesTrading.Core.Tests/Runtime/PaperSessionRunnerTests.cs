@@ -176,7 +176,7 @@ namespace NesTrading.Core.Tests.Runtime
                 foreach (var close in closes)
                 {
                     var token = Newtonsoft.Json.Linq.JObject.Parse(close.PayloadJson)["netPnlUsd"];
-                    var value = token == null ? 0m : token.Value<decimal>();
+                    var value = token == null ? 0m : token.ToObject<decimal>();
                     pnl += value;
                     if (value < 0m) losses++;
                     lastClose = close.TimestampUtc;
