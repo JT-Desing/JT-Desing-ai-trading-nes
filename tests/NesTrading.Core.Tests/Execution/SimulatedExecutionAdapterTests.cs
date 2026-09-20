@@ -154,7 +154,7 @@ namespace NesTrading.Core.Tests.Execution
             var result = adapter.SubmitBracket(Approved());
 
             Assert.That(result.Accepted, Is.True);
-            Assert.That(result.EntryFillPrice, Is.EqualTo(6122.5m)); // NES tick size 0.25 x 2.
+            Assert.That(result.EntryFillPrice, Is.EqualTo(6123.0m)); // NES tick size 0.50 x 2.
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace NesTrading.Core.Tests.Execution
             var result = adapter.SubmitBracket(Approved(direction: TradeDirection.Short));
 
             Assert.That(result.Accepted, Is.True);
-            Assert.That(result.EntryFillPrice, Is.EqualTo(6121.5m));
+            Assert.That(result.EntryFillPrice, Is.EqualTo(6121.0m));
         }
 
         [Test]
@@ -178,11 +178,11 @@ namespace NesTrading.Core.Tests.Execution
 
             var closed = adapter.CloseAtTarget(opened.TradeId, Now.AddMinutes(3));
 
-            // Long target 6130; one adverse exit tick => 6129.75.
-            // 7.75 points * $0.50 = $3.875 gross - $0.50 fees = $3.375.
+            // Long target 6130; one adverse NES tick => 6129.50.
+            // 7.50 points * $0.50 = $3.75 gross - $0.50 fees = $3.25.
             Assert.That(closed.Closed, Is.True);
-            Assert.That(closed.ExitFillPrice, Is.EqualTo(6129.75m));
-            Assert.That(closed.NetPnlUsd, Is.EqualTo(3.375m));
+            Assert.That(closed.ExitFillPrice, Is.EqualTo(6129.50m));
+            Assert.That(closed.NetPnlUsd, Is.EqualTo(3.25m));
             Assert.That(adapter.GetSnapshot().OpenTrades, Is.Empty);
         }
 
