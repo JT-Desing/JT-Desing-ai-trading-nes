@@ -15,6 +15,9 @@ namespace NesTrading.Core.Domain
             if (entryPrice <= 0m) throw new ArgumentOutOfRangeException(nameof(entryPrice));
             if (structuralStop <= 0m) throw new ArgumentOutOfRangeException(nameof(structuralStop));
             if (targetPrice <= 0m) throw new ArgumentOutOfRangeException(nameof(targetPrice));
+            NesContractSpecs.RequireTickAligned(entryPrice, nameof(entryPrice));
+            NesContractSpecs.RequireTickAligned(structuralStop, nameof(structuralStop));
+            NesContractSpecs.RequireTickAligned(targetPrice, nameof(targetPrice));
             if (setupScore < 0 || setupScore > 100) throw new ArgumentOutOfRangeException(nameof(setupScore));
             if (contracts != 1) throw new ArgumentOutOfRangeException(nameof(contracts), "V1 requires exactly one NES contract.");
             if (createdAtUtc.Kind != DateTimeKind.Utc) throw new ArgumentException("createdAtUtc must be UTC.", nameof(createdAtUtc));
