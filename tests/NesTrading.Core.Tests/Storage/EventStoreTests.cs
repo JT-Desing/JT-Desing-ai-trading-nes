@@ -90,6 +90,20 @@ namespace NesTrading.Core.Tests.Storage
         }
 
         [Test]
+        public void JsonlLoad_SameTimestampPreservesAppendOrder()
+        {
+            var path = Path.Combine(_tempDir, "same-time.jsonl");
+            var store = new JsonlEventStore(path);
+            store.Append(E("z-open", "s1", "TRADE_OPENED", T0, "{}", "sig-1", "trade-1"));
+            store.Append(E("a-close", "s1", "TRADE_CLOSED", T0, "{\"netPnlUsd\":1.0}", "sig-1", "trade-1"));
+
+            var events = store.LoadSession("s1");
+
+            Assert.That(events.Select(x => x.EventId).ToArray(), Is.EqualTo(new[] { "z-open", "a-close" }));
+            Assert.That(store.Reconstruct("s1").HasOpenPosition, Is.False);
+        }
+
+        [Test]
         public void TradingEvent_ContainsRequiredAuditFieldsAndStableHash()
         {
             var evt = E("evt-1", "s1", "RISK_APPROVED", T0, "{\"risk\":2.75}", "sig-1", "trade-1");
