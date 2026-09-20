@@ -61,18 +61,30 @@ namespace NesTrading.Core.Strategy
 
         public TradeCandidate BuildCandidate(MarketState market, NewsState news, MarketSnapshot snapshot)
         {
-            if (market == null) throw new ArgumentNullException(nameof(market));
             if (news == null) throw new ArgumentNullException(nameof(news));
             if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
 
+            var technical = BuildTechnicalCandidate(market, snapshot);
+            if (technical == null) return null;
+
             var now = snapshot.TimestampUtc;
-            if (!market.IsFreshAt(now) || !news.IsFreshAt(now)) return null;
-            if (!market.Valid || market.Setup != "VWAP_PULLBACK") return null;
-            if (market.Regime != MarketRegime.TrendUp && market.Regime != MarketRegime.TrendDown) return null;
+            if (!news.IsFreshAt(now)) return null;
             if (news.State == NewsGate.Block) return null;
 
             var threshold = news.State == NewsGate.Caution ? 85 : 75;
-            if (market.SetupScore < threshold) return null;
+            return market.SetupScore >= threshold ? technical : null;
+        }
+
+        public TradeCandidate BuildTechnicalCandidate(MarketState market, MarketSnapshot snapshot)
+        {
+            if (market == null) throw new ArgumentNullException(nameof(market));
+            if (snapshot == null) throw new ArgumentNullException(nameof(snapshot));
+
+            var now = snapshot.TimestampUtc;
+            if (!market.IsFreshAt(now)) return null;
+            if (!market.Valid || market.Setup != "VWAP_PULLBACK") return null;
+            if (market.Regime != MarketRegime.TrendUp && market.Regime != MarketRegime.TrendDown) return null;
+            if (market.SetupScore < 75) return null;
             if (market.Direction != TradeDirection.Long && market.Direction != TradeDirection.Short) return null;
             if (IsChasing(snapshot)) return null;
 
