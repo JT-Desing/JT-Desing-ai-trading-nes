@@ -10,3 +10,5 @@ Pre-flight:
 - Task 7 -> Tasks 5/6/8: budget controller consumed by model-backed agents; interfaces align.
 
 Task 1: complete (tests: GitHub Actions run #49 -> build success, 133/133 passed)
+
+Task 2: complete (tests: GitHub Actions run #52 -> 141/141 passed)
