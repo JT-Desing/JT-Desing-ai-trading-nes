@@ -1,4 +1,7 @@
-name: NES Core Safety Tests
+name: NES Core and Agent Safety Tests
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches: [ main ]
@@ -7,6 +10,7 @@ on:
 jobs:
   test:
     runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

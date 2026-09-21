@@ -33,7 +33,20 @@ CREATE TABLE IF NOT EXISTS agent_decisions (
     event_id TEXT UNIQUE NOT NULL,
     session_id TEXT NOT NULL,
     signal_id TEXT NULL,
+    cycle_id TEXT NOT NULL,
     agent_name TEXT NOT NULL,
+    schema_version TEXT NOT NULL,
+    prompt_version TEXT NOT NULL,
+    provider_name TEXT NOT NULL,
+    model_name TEXT NOT NULL,
+    generated_at_utc TEXT NULL,
+    valid_until_utc TEXT NULL,
+    status TEXT NOT NULL,
+    reason_code TEXT NULL,
+    raw_response_hash TEXT NULL,
+    input_tokens INTEGER NOT NULL DEFAULT 0,
+    output_tokens INTEGER NOT NULL DEFAULT 0,
+    reported_cost_usd REAL NULL,
     payload_json TEXT NOT NULL
 );
 
