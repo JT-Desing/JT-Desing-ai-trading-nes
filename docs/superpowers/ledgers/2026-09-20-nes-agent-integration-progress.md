@@ -14,3 +14,7 @@ Task 1: complete (tests: GitHub Actions run #49 -> build success, 133/133 passed
 Task 2: complete (tests: GitHub Actions run #52 -> 141/141 passed)
 
 Task 3: complete (tests: GitHub Actions run #59 -> build success, 152/152 passed)
+
+Task 4: complete (tests: GitHub Actions run #62 -> build success, 157/157 passed)
+Ruling: execute Task 7 before Tasks 5/6 because NewsAgent and TradeAgent consume AiUsageBudget — preserves declared interfaces and avoids temporary budget stubs — cost if wrong: reorder only, no behavior change.
+Ruling: AiUsageBudget.TryReserve accepts estimatedInputTokens in addition to maxOutputTokens — input-token and cost caps cannot be made atomic before a provider call otherwise — cost if wrong: one public method signature adjustment.
