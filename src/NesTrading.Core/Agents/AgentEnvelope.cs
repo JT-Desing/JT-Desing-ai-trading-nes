@@ -175,15 +175,38 @@ namespace NesTrading.Core.Agents
             DateTime startedAtUtc,
             DateTime finishedAtUtc)
         {
+            return FromStatusWithUsage(
+                status,
+                providerName,
+                modelName,
+                null,
+                0,
+                0,
+                null,
+                startedAtUtc,
+                finishedAtUtc);
+        }
+
+        public static ProviderCompletion FromStatusWithUsage(
+            ProviderCompletionStatus status,
+            string providerName,
+            string modelName,
+            string requestId,
+            int inputTokens,
+            int outputTokens,
+            decimal? reportedCostUsd,
+            DateTime startedAtUtc,
+            DateTime finishedAtUtc)
+        {
             return new ProviderCompletion(
                 status,
                 providerName,
                 modelName,
                 string.Empty,
-                null,
-                0,
-                0,
-                null,
+                requestId,
+                inputTokens,
+                outputTokens,
+                reportedCostUsd,
                 startedAtUtc,
                 finishedAtUtc);
         }
