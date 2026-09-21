@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using NesTrading.Core.Agents;
@@ -145,7 +146,7 @@ namespace NesTrading.Core.Tests.Agents
                 200);
 
         private static string CompletedBody(string output) =>
-            "{\"id\":\"resp_1\",\"status\":\"completed\",\"model\":\"gpt-5.6-luna\",\"output\":[{\"type\":\"message\",\"content\":[{\"type\":\"output_text\",\"text\":" + JValue.CreateString(output).ToString() + "}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5}}";
+            "{\"id\":\"resp_1\",\"status\":\"completed\",\"model\":\"gpt-5.6-luna\",\"output\":[{\"type\":\"message\",\"content\":[{\"type\":\"output_text\",\"text\":" + JsonConvert.ToString(output) + "}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5}}";
 
         private sealed class RecordingHandler : HttpMessageHandler
         {
