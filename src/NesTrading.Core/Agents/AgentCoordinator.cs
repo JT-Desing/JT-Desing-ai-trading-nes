@@ -52,7 +52,7 @@ namespace NesTrading.Core.Agents
             if (!_cache.TryPublishMarket(market))
                 return Fail(cycleId, "CACHE_REJECTED", market, null, null, null);
 
-            if (!TryAudit("NEWS_AGENT_REQUESTED", now, cycleId, new[] { "REQUESTED" }, null, null))
+            if (!TryAudit<object>("NEWS_AGENT_REQUESTED", now, cycleId, new[] { "REQUESTED" }, null, null))
                 return Fail(cycleId, "AUDIT_PERSISTENCE_FAILURE", market, null, null, null);
 
             var newsRefresh = await _newsAgent.ValidateWithoutPublishAsync(
@@ -85,7 +85,7 @@ namespace NesTrading.Core.Agents
                 return Fail(cycleId, "NO_TECHNICAL_CANDIDATE", market, news, null, null);
             }
 
-            if (!TryAudit("TRADE_AGENT_REQUESTED", now, cycleId, new[] { "REQUESTED" }, null, null, candidate.SignalId))
+            if (!TryAudit<object>("TRADE_AGENT_REQUESTED", now, cycleId, new[] { "REQUESTED" }, null, null, candidate.SignalId))
                 return Fail(cycleId, "AUDIT_PERSISTENCE_FAILURE", market, news, null, candidate);
 
             var tradeContext = new TradeAgentContext(
