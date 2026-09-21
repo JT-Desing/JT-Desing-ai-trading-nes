@@ -173,10 +173,14 @@ namespace NesTrading.Core.Agents.Providers
             var outputTokens = SafeInt(json["usage"]?["output_tokens"]);
 
             if (string.Equals(status, "incomplete", StringComparison.OrdinalIgnoreCase))
-                return ProviderCompletion.FromStatus(
+                return ProviderCompletion.FromStatusWithUsage(
                     ProviderCompletionStatus.Incomplete,
                     "openai",
                     model,
+                    requestId,
+                    inputTokens,
+                    outputTokens,
+                    null,
                     started,
                     finished);
 
@@ -190,10 +194,14 @@ namespace NesTrading.Core.Agents.Providers
                 .ToArray() ?? new JObject[0];
 
             if (contentItems.Any(x => string.Equals((string)x["type"], "refusal", StringComparison.Ordinal)))
-                return ProviderCompletion.FromStatus(
+                return ProviderCompletion.FromStatusWithUsage(
                     ProviderCompletionStatus.Refused,
                     "openai",
                     model,
+                    requestId,
+                    inputTokens,
+                    outputTokens,
+                    null,
                     started,
                     finished);
 
@@ -211,10 +219,14 @@ namespace NesTrading.Core.Agents.Providers
                 .FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
 
             if (string.IsNullOrWhiteSpace(outputText))
-                return ProviderCompletion.FromStatus(
+                return ProviderCompletion.FromStatusWithUsage(
                     ProviderCompletionStatus.Incomplete,
                     "openai",
                     model,
+                    requestId,
+                    inputTokens,
+                    outputTokens,
+                    null,
                     started,
                     finished);
 
