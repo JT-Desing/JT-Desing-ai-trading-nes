@@ -31,6 +31,12 @@ namespace NesTrading.Core.Agents
             object usageRecord) =>
             new AgentRefreshResult<T>(true, true, "PUBLISHED", state, completion, usageRecord);
 
+        public static AgentRefreshResult<T> ValidatedState(
+            AgentEnvelope<T> state,
+            ProviderCompletion completion,
+            object usageRecord) =>
+            new AgentRefreshResult<T>(true, false, "VALIDATED", state, completion, usageRecord);
+
         public static AgentRefreshResult<T> Failure(
             string reasonCode,
             ProviderCompletion completion = null,
