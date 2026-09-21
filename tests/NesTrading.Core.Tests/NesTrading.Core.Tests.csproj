@@ -13,4 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\NesTrading.Core\NesTrading.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
 </Project>
