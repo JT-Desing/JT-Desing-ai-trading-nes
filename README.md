@@ -183,15 +183,118 @@ If persistence fails after execution may have occurred, the runtime enters an em
 
 Technical candidates are recorded even when News later blocks them. This enables future counterfactual analysis of whether News vetoes avoided losses or incorrectly blocked profitable trades.
 
+## Agent integration
+
+The repository now also contains a **structured advisory-agent layer**. It does not replace deterministic strategy, risk, or execution code.
+
+### Market Agent
+
+The Market Agent is deterministic in V1. It wraps the existing Trend Pullback + VWAP evaluator and performs **zero LLM calls**.
+
+It publishes a versioned `market.v1` envelope containing the same regime, direction, setup score, TTL, and reason codes produced by the deterministic strategy.
+
+### News Agent
+
+The News Agent accepts pre-collected calendar/news context and may use a model provider to classify only:
+
+- `ALLOW`
+- `CAUTION`
+- `BLOCK`
+
+Its schema does not permit BUY/SELL instructions, contract sizing, entries, stops, or targets.
+
+Provider refusals, malformed JSON, unsupported enum values, wrong symbols, stale timestamps, future timestamps, timeout, API failure, or exhausted AI budget do **not** create a tradable News state.
+
+### Trade Agent
+
+The Trade Agent may emit only:
+
+- `LONG`
+- `SHORT`
+- `WAIT`
+- `EXIT_RECOMMENDATION`
+
+Before a provider call is allowed, deterministic guards require a fresh Market state, fresh News state, a technical candidate, known broker position, no open position, and an unlocked system state.
+
+A model decision that contradicts the deterministic candidate direction is rejected. Model confidence does not modify position size; V1 remains fixed at one NES contract maximum.
+
+### Strict schema boundary
+
+Model-backed output is parsed through strict semantic validation before it can enter the state cache.
+
+Agent envelopes include:
+
+- schema version;
+- prompt version;
+- provider/model metadata;
+- generation and expiration timestamps;
+- received timestamp;
+- SHA-256 hash of the raw response;
+- immutable validated domain payload.
+
+Unknown top-level properties are rejected rather than ignored. This prevents a provider from silently introducing fields such as `contracts`, `stop`, or other risk-changing instructions.
+
+### TTL and atomic state cache
+
+News, Market, and Trade states are stored independently in an in-memory cache.
+
+The cache:
+
+- never treats expired state as usable;
+- refuses an older state that attempts to overwrite a newer one;
+- rejects state received after its own expiry;
+- starts empty after process restart.
+
+A restart therefore cannot assume previously cached AI context remains valid.
+
+### AI usage and cost controls
+
+A synchronized budget controller enforces, before provider calls:
+
+- maximum calls per session;
+- maximum calls per agent;
+- input-token budget;
+- output-token budget;
+- estimated/provider-reported cost budget.
+
+Reservations are atomic so concurrent agents cannot independently overcommit the same remaining budget. Failed provider calls still count as calls. Budget exhaustion fails closed and does not trigger an unbudgeted fallback request.
+
+### Agent Coordinator and audit-before-publish
+
+The coordinator runs the advisory cycle in this order:
+
+`Market -> persist -> News -> persist -> technical candidate -> Trade -> persist -> cache publish -> cycle summary`
+
+Model-backed state is validated without publishing first. If its audit write fails, that state is **not published to the shared cache**.
+
+The agent audit records correlation IDs, schemas, prompts, provider/model metadata, TTL, response hashes, usage, costs, and explicit reason codes. Secrets are excluded.
+
+### OpenAI provider boundary
+
+An isolated OpenAI Responses API adapter is implemented for Structured Outputs.
+
+It uses schema-constrained `text.format` requests with `type: json_schema` and strict validation. The API key is supplied only at process composition time (for example through `OPENAI_API_KEY`) and is sent only as the Bearer authorization header; it is not included in request JSON, agent envelopes, audit events, or provider error payloads.
+
+The adapter maps completed responses, refusals, incomplete responses, HTTP failures, malformed responses, deadlines, and cancellation into the common provider contract consumed by the agents.
+
+**This does not mean live OpenAI trading is enabled.** A production runtime still needs deliberate configuration, approved credentials, and a real news/calendar data source.
+
+### Final authority remains deterministic
+
+The complete advisory path is:
+
+`Market data -> Market Agent -> News Agent -> Trade Agent -> validated cache -> Risk Engine -> execution`
+
+The Risk Engine independently re-checks freshness, News policy, direction consistency, daily/session limits, structural stop risk, fees, slippage, spread, and reward/risk. A previously valid AI cycle can therefore still be rejected moments later if state has expired or risk conditions have changed.
+
 ## What is NOT implemented yet
 
 This repository must not be treated as a live trading robot.
 
 Still deferred to separate reviewed plans:
 
-- Real-time News Agent integrations.
-- OpenAI agent calls.
-- Production schema validation for AI responses.
+- Real-time economic-calendar/news-vendor ingestion.
+- Production runtime composition with approved OpenAI credentials.
 - NinjaTrader AddOn / NinjaScript adapter.
 - Live market-data adapter.
 - Live broker order submission.
