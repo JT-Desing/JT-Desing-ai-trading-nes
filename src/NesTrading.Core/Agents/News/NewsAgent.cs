@@ -36,10 +36,23 @@ namespace NesTrading.Core.Agents.News
             _maxOutputTokens = maxOutputTokens;
         }
 
-        public async Task<AgentRefreshResult<NewsState>> RefreshAsync(
+        public Task<AgentRefreshResult<NewsState>> RefreshAsync(
             string sourceContext,
             DateTime utcNow,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken) =>
+            RefreshCoreAsync(sourceContext, utcNow, cancellationToken, true);
+
+        public Task<AgentRefreshResult<NewsState>> ValidateWithoutPublishAsync(
+            string sourceContext,
+            DateTime utcNow,
+            CancellationToken cancellationToken) =>
+            RefreshCoreAsync(sourceContext, utcNow, cancellationToken, false);
+
+        private async Task<AgentRefreshResult<NewsState>> RefreshCoreAsync(
+            string sourceContext,
+            DateTime utcNow,
+            CancellationToken cancellationToken,
+            bool publish)
         {
             if (sourceContext == null) throw new ArgumentNullException(nameof(sourceContext));
             if (utcNow.Kind != DateTimeKind.Utc) throw new ArgumentException("utcNow must be UTC.", nameof(utcNow));
@@ -88,6 +101,9 @@ namespace NesTrading.Core.Agents.News
 
             if (envelope.ValidUntilUtc < utcNow)
                 return AgentRefreshResult<NewsState>.Failure("STATE_EXPIRED_BEFORE_PUBLISH", completion, usage);
+
+            if (!publish)
+                return AgentRefreshResult<NewsState>.ValidatedState(envelope, completion, usage);
 
             if (!_cache.TryPublishNews(envelope))
                 return AgentRefreshResult<NewsState>.Failure("CACHE_REJECTED", completion, usage);
