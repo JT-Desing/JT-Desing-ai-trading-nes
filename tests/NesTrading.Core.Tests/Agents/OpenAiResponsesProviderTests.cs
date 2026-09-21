@@ -83,7 +83,7 @@ namespace NesTrading.Core.Tests.Agents
             Assert.That(result.OutputText, Is.Empty);
         }
 
-        [TestCase(HttpStatusCode.TooManyRequests)]
+        [TestCase((HttpStatusCode)429)]
         [TestCase(HttpStatusCode.InternalServerError)]
         [TestCase(HttpStatusCode.BadGateway)]
         public async Task CompleteAsync_HttpFailureMapsToFailedWithoutThrowing(HttpStatusCode status)
