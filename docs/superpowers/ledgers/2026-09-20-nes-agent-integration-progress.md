@@ -27,3 +27,5 @@ Task 5: complete (tests: GitHub Actions run #69 -> build success, 180/180 passed
 Task 6: complete (tests: GitHub Actions run #75 -> build success, 195/195 passed)
 
 Ruling: Task 8 requires audit-before-publish, while Tasks 5/6 currently publish inside RefreshAsync. Add validated-without-publish paths to NewsAgent/TradeAgent and let AgentCoordinator persist first, then publish to the shared cache. Existing RefreshAsync behavior remains unchanged for standalone use. Cost if wrong: one additional agent API path; safety benefit is preventing unaudited model state from reaching runtime.
+
+Ruling: execute Task 7 before Tasks 5 and 6 — News/Trade Agents consume AiUsageBudget, so implementing the budget first avoids temporary duplicate interfaces; scope unchanged. Cost if wrong: task-order refactor only.
