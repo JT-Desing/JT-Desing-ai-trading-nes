@@ -69,6 +69,8 @@ namespace NesTrading.Core.Tests.Agents
 
             Assert.That(result.Status, Is.EqualTo(ProviderCompletionStatus.Refused));
             Assert.That(result.OutputText, Is.Empty);
+            Assert.That(result.InputTokens, Is.EqualTo(10));
+            Assert.That(result.OutputTokens, Is.EqualTo(4));
         }
 
         [Test]
@@ -82,6 +84,8 @@ namespace NesTrading.Core.Tests.Agents
 
             Assert.That(result.Status, Is.EqualTo(ProviderCompletionStatus.Incomplete));
             Assert.That(result.OutputText, Is.Empty);
+            Assert.That(result.InputTokens, Is.EqualTo(10));
+            Assert.That(result.OutputTokens, Is.EqualTo(200));
         }
 
         [TestCase((HttpStatusCode)429)]
