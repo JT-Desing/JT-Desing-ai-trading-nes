@@ -31,3 +31,5 @@ Ruling: Task 8 requires audit-before-publish, while Tasks 5/6 currently publish 
 Ruling: execute Task 7 before Tasks 5 and 6 — News/Trade Agents consume AiUsageBudget, so implementing the budget first avoids temporary duplicate interfaces; scope unchanged. Cost if wrong: task-order refactor only.
 
 Task 8: complete (tests: GitHub Actions run #85 -> 2026-09-21T15:28:24.2824695Z Build succeeded. | 2026-09-21T15:28:24.2834943Z     0 Error(s) | 2026-09-21T15:28:43.8771613Z Test Run Successful. | 2026-09-21T15:28:43.8772242Z Total tests: 201 | 2026-09-21T15:28:43.8772752Z      Passed: 201)
+
+Task 9: complete (tests: GitHub Actions run #91 -> 2026-09-21T15:37:31.0596442Z Build succeeded. | 2026-09-21T15:37:31.0602650Z     0 Error(s) | 2026-09-21T15:37:47.4649934Z Test Run Successful. | 2026-09-21T15:37:47.4650494Z Total tests: 211 | 2026-09-21T15:37:47.4651004Z      Passed: 211)
