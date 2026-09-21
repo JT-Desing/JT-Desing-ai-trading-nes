@@ -20,3 +20,4 @@ Ruling: execute Task 7 before Tasks 5/6 because NewsAgent and TradeAgent consume
 Ruling: AiUsageBudget.TryReserve accepts estimatedInputTokens in addition to maxOutputTokens — input-token and cost caps cannot be made atomic before a provider call otherwise — cost if wrong: one public method signature adjustment.
 
 Task 7: complete (executed before Tasks 5/6 by ruling; tests: GitHub Actions run #66 -> build success, 168/168 passed)
+Ruling: create AgentRefreshResult<T> in Task 5 rather than Task 8 — Tasks 5/6 need the shared result contract before the coordinator exists — cost if wrong: file/type relocation only.
