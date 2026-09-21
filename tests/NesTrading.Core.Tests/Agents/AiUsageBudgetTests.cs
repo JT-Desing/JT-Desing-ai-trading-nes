@@ -45,7 +45,7 @@ namespace NesTrading.Core.Tests.Agents
         [Test]
         public void Reserve_MaxSessionCallsReached_IsRejected()
         {
-            var budget = new AiUsageBudget(Policy(maxCalls: 1));
+            var budget = new AiUsageBudget(Policy(maxCalls: 1, maxCallsPerAgent: 1));
             Assert.That(budget.TryReserve(AgentRole.News, 10, 10, Now).Granted, Is.True);
 
             var second = budget.TryReserve(AgentRole.Trade, 10, 10, Now);
@@ -149,7 +149,7 @@ namespace NesTrading.Core.Tests.Agents
         [Test]
         public void RejectedReservation_CannotBeSettled()
         {
-            var budget = new AiUsageBudget(Policy(maxCalls: 0 + 1));
+            var budget = new AiUsageBudget(Policy(maxCalls: 1, maxCallsPerAgent: 1));
             var first = budget.TryReserve(AgentRole.News, 10, 10, Now);
             var rejected = budget.TryReserve(AgentRole.Trade, 10, 10, Now);
             budget.Settle(first, ProviderCompletion.CompletedForTests("{}"));
