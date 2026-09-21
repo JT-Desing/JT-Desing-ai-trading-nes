@@ -36,10 +36,23 @@ namespace NesTrading.Core.Agents.Trade
             _maxOutputTokens = maxOutputTokens;
         }
 
-        public async Task<AgentRefreshResult<TradeDecision>> RefreshAsync(
+        public Task<AgentRefreshResult<TradeDecision>> RefreshAsync(
             TradeAgentContext context,
             DateTime utcNow,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken) =>
+            RefreshCoreAsync(context, utcNow, cancellationToken, true);
+
+        public Task<AgentRefreshResult<TradeDecision>> ValidateWithoutPublishAsync(
+            TradeAgentContext context,
+            DateTime utcNow,
+            CancellationToken cancellationToken) =>
+            RefreshCoreAsync(context, utcNow, cancellationToken, false);
+
+        private async Task<AgentRefreshResult<TradeDecision>> RefreshCoreAsync(
+            TradeAgentContext context,
+            DateTime utcNow,
+            CancellationToken cancellationToken,
+            bool publish)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (utcNow.Kind != DateTimeKind.Utc) throw new ArgumentException("utcNow must be UTC.", nameof(utcNow));
@@ -95,6 +108,9 @@ namespace NesTrading.Core.Agents.Trade
                 return AgentRefreshResult<TradeDecision>.Failure("TRADE_DIRECTION_CONTRADICTION", completion, usage);
             if (envelope.Payload.Action == TradeAction.Short && context.Candidate.Direction != TradeDirection.Short)
                 return AgentRefreshResult<TradeDecision>.Failure("TRADE_DIRECTION_CONTRADICTION", completion, usage);
+
+            if (!publish)
+                return AgentRefreshResult<TradeDecision>.ValidatedState(envelope, completion, usage);
 
             if (!_cache.TryPublishTrade(envelope))
                 return AgentRefreshResult<TradeDecision>.Failure("CACHE_REJECTED", completion, usage);
