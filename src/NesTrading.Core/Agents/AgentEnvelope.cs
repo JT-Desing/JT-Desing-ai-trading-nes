@@ -168,7 +168,7 @@ namespace NesTrading.Core.Agents
                 0, 0, 0m, t.AddMilliseconds(-100), t);
         }
 
-        public static ProviderCompletion Status(
+        public static ProviderCompletion FromStatus(
             ProviderCompletionStatus status,
             string providerName,
             string modelName,
