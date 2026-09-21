@@ -17,7 +17,7 @@ namespace NesTrading.Core.Agents.Providers
             var started = DateTime.UtcNow;
 
             if (cancellationToken.IsCancellationRequested)
-                return ProviderCompletion.Status(
+                return ProviderCompletion.FromStatus(
                     ProviderCompletionStatus.Cancelled,
                     "unknown",
                     request.Model,
@@ -26,7 +26,7 @@ namespace NesTrading.Core.Agents.Providers
 
             var remaining = request.DeadlineUtc - DateTime.UtcNow;
             if (remaining <= TimeSpan.Zero)
-                return ProviderCompletion.Status(
+                return ProviderCompletion.FromStatus(
                     ProviderCompletionStatus.TimedOut,
                     "unknown",
                     request.Model,
@@ -42,14 +42,14 @@ namespace NesTrading.Core.Agents.Providers
                 if (winner != providerTask)
                 {
                     if (cancellationToken.IsCancellationRequested)
-                        return ProviderCompletion.Status(
+                        return ProviderCompletion.FromStatus(
                             ProviderCompletionStatus.Cancelled,
                             "unknown",
                             request.Model,
                             started,
                             DateTime.UtcNow);
 
-                    return ProviderCompletion.Status(
+                    return ProviderCompletion.FromStatus(
                         ProviderCompletionStatus.TimedOut,
                         "unknown",
                         request.Model,
@@ -61,7 +61,7 @@ namespace NesTrading.Core.Agents.Providers
             }
             catch (OperationCanceledException)
             {
-                return ProviderCompletion.Status(
+                return ProviderCompletion.FromStatus(
                     cancellationToken.IsCancellationRequested
                         ? ProviderCompletionStatus.Cancelled
                         : ProviderCompletionStatus.TimedOut,
@@ -72,7 +72,7 @@ namespace NesTrading.Core.Agents.Providers
             }
             catch
             {
-                return ProviderCompletion.Status(
+                return ProviderCompletion.FromStatus(
                     ProviderCompletionStatus.Failed,
                     "unknown",
                     request.Model,
