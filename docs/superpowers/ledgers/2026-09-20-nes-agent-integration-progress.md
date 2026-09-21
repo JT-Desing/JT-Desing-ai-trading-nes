@@ -21,3 +21,5 @@ Ruling: AiUsageBudget.TryReserve accepts estimatedInputTokens in addition to max
 
 Task 7: complete (executed before Tasks 5/6 by ruling; tests: GitHub Actions run #66 -> build success, 168/168 passed)
 Ruling: create AgentRefreshResult<T> in Task 5 rather than Task 8 — Tasks 5/6 need the shared result contract before the coordinator exists — cost if wrong: file/type relocation only.
+
+Task 5: complete (tests: GitHub Actions run #69 -> build success, 180/180 passed)
