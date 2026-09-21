@@ -33,3 +33,7 @@ Ruling: execute Task 7 before Tasks 5 and 6 — News/Trade Agents consume AiUsag
 Task 8: complete (tests: GitHub Actions run #85 -> 2026-09-21T15:28:24.2824695Z Build succeeded. | 2026-09-21T15:28:24.2834943Z     0 Error(s) | 2026-09-21T15:28:43.8771613Z Test Run Successful. | 2026-09-21T15:28:43.8772242Z Total tests: 201 | 2026-09-21T15:28:43.8772752Z      Passed: 201)
 
 Task 9: complete (tests: GitHub Actions run #91 -> 2026-09-21T15:37:31.0596442Z Build succeeded. | 2026-09-21T15:37:31.0602650Z     0 Error(s) | 2026-09-21T15:37:47.4649934Z Test Run Successful. | 2026-09-21T15:37:47.4650494Z Total tests: 211 | 2026-09-21T15:37:47.4651004Z      Passed: 211)
+
+Ruling: Task 10 end-to-end tests passed on first execution because Tasks 1-9 already implemented the required behavior; treat Task 10 as a regression/integration gate rather than inventing production changes solely to force RED. Cost if wrong: reduced proof that a new production path was introduced; mitigated by the integration suite exercising the real existing path.
+
+Task 10: complete (tests: GitHub Actions run #95 -> 2026-09-21T15:44:04.0047721Z Build succeeded. | 2026-09-21T15:44:04.0095553Z     0 Error(s) | 2026-09-21T15:44:15.4417273Z Test Run Successful. | 2026-09-21T15:44:15.4417623Z Total tests: 217 | 2026-09-21T15:44:15.4417899Z      Passed: 217)
