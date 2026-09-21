@@ -14,6 +14,7 @@ namespace NesTrading.Core.Agents
         Incomplete,
         TimedOut,
         Failed,
+        Cancelled,
         BudgetExhausted
     }
 }
