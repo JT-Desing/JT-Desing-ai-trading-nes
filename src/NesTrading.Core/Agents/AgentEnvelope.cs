@@ -167,5 +167,25 @@ namespace NesTrading.Core.Agents
             return new ProviderCompletion(status, "test-provider", "test-model", outputText, "test-request",
                 0, 0, 0m, t.AddMilliseconds(-100), t);
         }
+
+        public static ProviderCompletion Status(
+            ProviderCompletionStatus status,
+            string providerName,
+            string modelName,
+            DateTime startedAtUtc,
+            DateTime finishedAtUtc)
+        {
+            return new ProviderCompletion(
+                status,
+                providerName,
+                modelName,
+                string.Empty,
+                null,
+                0,
+                0,
+                null,
+                startedAtUtc,
+                finishedAtUtc);
+        }
     }
 }
